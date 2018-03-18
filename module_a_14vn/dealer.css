@@ -169,11 +169,11 @@ html, body {width:100%; height:100%; font-family:Arial, Helvetica, sans-serif; f
 .car#porsche-4 {background-image: url('images/Porsche_4.jpg'); z-index: 3; }
 
 .car#volkswagen-1 {background-image: url('images/Volkswagen_1.jpg');}
-.car#volkswagen-2 {background-image: url('images/Volkswagen_2.png');}
-.car#volkswagen-3 {background-image: url('images/Volkswagen_3.jpg');}
-.car#volkswagen-4 {background-image: url('images/Volkswagen_4.jpg');}
-.car#volkswagen-5 {background-image: url('images/Volkswagen_5.jpg');}
-.car#volkswagen-6 {background-image: url('images/Volkswagen_6.jpg');}
+.car#volkswagen-2 {background-image: url('images/volkswagen_2.png');}
+.car#volkswagen-3 {background-image: url('images/volkswagen_3.jpg');}
+.car#volkswagen-4 {background-image: url('images/volkswagen_4.jpg');}
+.car#volkswagen-5 {background-image: url('images/volkswagen_5.jpg');}
+.car#volkswagen-6 {background-image: url('images/volkswagen_6.jpg');}
 
 .car#audi-1 {background-image: url('images/Audi_1.jpg');}
 .car#audi-2 {background-image: url('images/Audi_2.jpg');}
