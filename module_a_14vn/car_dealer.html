@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Car Dealer</title>
+	<link rel="stylesheet" href="dealer.css" type="text/css" />
+	<script type="text/javascript" language="javascript" src="jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" language="javascript" src="jquery/js/jquery-ui-1.9.2.custom.js"></script>
+    <script type="text/javascript" language="javascript" src="dealer.js"></script>
+
+    <script>
+        /*
+        $(document).ready(function(){
+            $('#porsche-4').draggable({
+                revert: function(valid){
+                    return !valid;
+                }
+            })
+            $('#exit').droppable({
+                accept: '#porsche-4',
+                drop: function(event, ui){
+                    ui  .draggable
+                        .appendTo($(this))
+                        .css({'position': 'absolute','left':'50%','top':'50%','margin-left':'-25px','margin-top':'-25px'})
+                        .fadeOut(2000, function() {
+                            $(this).remove();
+                        });
+                }
+            })
+        })
+        */
+    </script>
+</head>
+
+<body>
+	<div id="salon">
+    	<div id="clients_queue">
+        	<!-- khách hàng sẽ xếp hàng vô -->
+        </div>
+    	<div id="cars_place">
+        	<div id="porsche" class="place">
+			    <div class="logo"></div> <!-- load hình logo lên -->
+                <div class="products">
+                    Porsche
+                    <div id="porsche-quantity" class="brand-quantity">
+                        4
+                    </div>
+                </div>
+                <div class="placeholder">
+                    <div class="car" id="porsche-1"></div> <!-- load hình xe -->
+                    <div class="car" id="porsche-2"></div>
+                    <div class="car" id="porsche-3"></div>
+                    <div class="car" id="porsche-4"></div>
+                </div>
+            </div>
+
+        	<div id="volkswagen" class="place">
+			    <div class="logo"></div>
+                <div class="products">
+                    Volkswagen
+                    <div id="volkswagen-quantity" class="brand-quantity">
+                        6
+                    </div>
+                </div>
+                <div class="placeholder">
+                    <div class="car" id="volkswagen-1"></div>
+                    <div class="car" id="volkswagen-2"></div>
+                    <div class="car" id="volkswagen-3"></div>
+                    <div class="car" id="volkswagen-4"></div>
+                    <div class="car" id="volkswagen-5"></div>
+                    <div class="car" id="volkswagen-6"></div>
+                </div>
+            </div>
+
+        	<div id="audi" class="place">
+			    <div class="logo"></div>
+                <div class="products">
+                    Audi
+                    <div id="audi-quantity" class="brand-quantity">
+                        5
+                    </div>
+                </div>
+                <div class="placeholder">
+                    <div class="car" id="audi-1"></div>
+                    <div class="car" id="audi-2"></div>
+                    <div class="car" id="audi-3"></div>
+                    <div class="car" id="audi-4"></div>
+                    <div class="car" id="audi-5"></div>
+                </div>
+            </div>
+
+        	<div id="bmw" class="place">
+			    <div class="logo"></div>
+                <div class="products">
+                    BMW
+                    <div id="bmw-quantity" class="brand-quantity">
+                        3
+                    </div>
+                </div>
+                <div class="placeholder">
+                    <div class="car" id="bmw-1"></div>
+                    <div class="car" id="bmw-2"></div>
+                    <div class="car" id="bmw-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cashier">
+            <!-- load hình cô thu ngân lên -->
+        </div>
+
+        <div id="exit">
+            <!-- load hình exit lên -->
+        </div>
+
+        <div id="display">
+        	<ul>
+            	<li id="clients_served">0 clients</li>
+				<li id="cars_sold">0 cars</li>
+                <li id="amount">€ 0,00</li>
+            </ul>    
+        </div>
+    </div>
+</body>
+</html>
