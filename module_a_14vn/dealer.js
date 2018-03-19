@@ -7,10 +7,7 @@ var myServed = 0;
 var myCost = 0;
 var myCar = 0;
 
-var porscheInStock = 4;
-var volkswagenInStock = 6;
-var audiInStock = 5;
-var bmwInStock = 3;
+var noVacancyBrandId = new Array();
 
 function newClient(){
 	var preference = Math.floor((Math.random()*4));// random từ 0 - 3 để làm key gọi phần tử mảng hiệu xe
@@ -49,6 +46,41 @@ function updateDisplayInfo(){
 	$('#amount').html('€ ' + myCost);
 }
 
+// + Hàm cập nhật các hãng xe ko còn trống (đều đang xem / bán)
+// + Nếu khách hàng rơi vào tình huống đó thì có thể xem
+// bất kỳ hãng xe nào còn trống (đánh dấu bằng id = 'valid')
+// + Hàm này chạy lặp lại, để cập nhật liên tục
+function checkVacancy(){
+	var i = 0;
+	for(i; i < brandlist.length; i++){
+		// Nếu hãng xe này ko trống, đang xem | vừa chiếc đang xem vừa chiếc bán rồi | bán hết rồi
+		if($('#cars_place #'+brandlistalias[i]).hasClass('ui-state-disabled')){
+			// Nếu đã cập nhật rồi thì thôi (vào mảng chứa các brand-id của hãng xe ko còn trống)
+			if($.inArray(i, noVacancyBrandId) == -1){
+				noVacancyBrandId.push(i);
+			}
+		// Nếu hãng xe này còn trống chỗ mà có trong mảng ko còn trống
+		// thì cập nhật lại
+		}else if($('#cars_place #'+brandlistalias[i]).hasClass('ui-droppable')){
+			if($.inArray(i, noVacancyBrandId) != -1){
+				var index = noVacancyBrandId.indexOf(i);
+				noVacancyBrandId.splice(index, 1);
+			}
+		}
+	}
+	var firstClient = $('#clients_queue div.client:first');
+
+	if($.inArray(parseInt(firstClient.attr('brand-id')), noVacancyBrandId) != -1){
+		firstClient.attr('id', 'valid');
+		firstClient.attr('brand-id', -69);
+		firstClient.html('<span class="preference">Valid</span>');
+	}
+	// console.log('Có brand-id thuộc mảng hết chỗ: ' + $.inArray(parseInt(firstClient.attr('brand-id')), noVacancyBrandId) );
+	// console.log('brand-id của first client: '+firstClient.attr('brand-id'));
+	// console.log('Mảng hết chỗ: '+noVacancyBrandId);
+	setTimeout(function(){checkVacancy();},1000);
+}
+
 $("document").ready(function() {
 	// Thêm 1 class tên là 'free' cho mấy thẻ có class là 'car'
 	$('.car').each(function(){
@@ -62,8 +94,9 @@ $("document").ready(function() {
 			// Khách hàng muốn xem xe hãng nào, chỉ cho phép vô hãng đó
 			// Chấp nhận k/h nào có brand-id(0,1,2,3) tương ứng 
 			// với id(porsche,volkswagen,audi,bmw) của tui, tui mới cho
-			accept: '#clients_queue div.client[brand-id='+i+']',
+			accept: '#clients_queue div.client[brand-id='+i+'], #valid',
 			drop: function(event, ui){
+
 				// cập nhật số khách đang đợi
 				totalClients--;
 				/*
@@ -73,6 +106,7 @@ $("document").ready(function() {
         		 * CHÚ Ý: $.inArray returns the index of the element if found or -1 if it isn't -- not a boolean value
 				 */
 				var brand_id = $.inArray($(this).attr('id'), brandlistalias);
+
 				/*
 				 * target tới --> 	Chiếc xe đầu tiên [0] còn trống /free/
 				 * 					(từ trái qua) của hãng xe (#porsche/#audi/..)
@@ -92,6 +126,12 @@ $("document").ready(function() {
 						})
 					.attr('car_id', $(served_car).attr('id'));
 
+				if(ui.draggable.attr('id') == 'valid'){
+					// alert(brand_id);
+					ui.draggable.attr('brand-id', brand_id);
+					ui.draggable.removeAttr('id');
+				}
+
 				// làm dấu là xe đang đc người ta xem, 
 				// mấy class này k có CSS, chỉ để làm dấu
 				$(served_car).removeClass('free').addClass('served');
@@ -110,18 +150,30 @@ $("document").ready(function() {
 			// Khách hàng muốn xem xe hãng nào, chỉ cho phép vô hãng đó
 			// Chấp nhận k/h nào có brand-id(0,1,2,3) tương ứng 
 			// với id(porsche,volkswagen,audi,bmw) của tui, tui mới cho
-			accept: '#clients_queue div.client[brand-id='+i+']',
+			accept: '#clients_queue div.client[brand-id='+i+'], #valid, div.client.served[brand-id='+i+']',
 			greedy: true, // Tham lam, gần là lấy luôn
 			drop: function(event, ui){
-				// cập nhật số khách đang đợi
-				totalClients--;
+				// Nếu k/h đang chuyển giữa các xe trong cùng 1 hãng..
+				if(ui.draggable.hasClass('served')){
+					car_id_old = ui.draggable.attr('car_id');
+					$('#' + car_id_old)	.removeClass('served')
+										.addClass('free')
+										.droppable('enable');
+				}else{
+					// + Cập nhật số khách đang đợi
+					// + Không cập nhật khi k/h chỉ chuyển qua lại
+					// xem xe khác trong cùng 1 hãng (ko phải từ bên xếp hàng qua)
+					totalClients--;
+				}
 				/*
 				 * Ý nghĩa: chỉ là chuyển đổi từ value --> key của 1 mảng
 				 * 	<div id="cars_place">
         			<div id="porsche" class="place">
         		 * CHÚ Ý: $.inArray returns the index of the element if found or -1 if it isn't -- not a boolean value
 				 */
-				var brand_id = $.inArray($(this).attr('id'), brandlistalias);
+				var brandalias = $(this).attr('id').substring(0, $(this).attr('id').indexOf('-'))
+				var brand_id = $.inArray(brandalias, brandlistalias);
+
 				/*
 				 * target tới --> 	Chính chiếc xe này
 				 */
@@ -138,6 +190,12 @@ $("document").ready(function() {
 							'height'	: 	'50px'
 						})
 					.attr('car_id', $(served_car).attr('id'));
+
+				if(ui.draggable.attr('id') == 'valid'){
+					// alert(brand_id);
+					ui.draggable.attr('brand-id', brand_id);
+					ui.draggable.removeAttr('id');
+				}
 
 				// làm dấu là xe đang đc người ta xem, 
 				// mấy class này k có CSS, chỉ để làm dấu
@@ -157,7 +215,6 @@ $("document").ready(function() {
 		accept: '.client',
 		drop: function(event, ui){
 			if(ui.draggable.hasClass('served')){// kéo từ trái qua
-				myServed++;
 				car_id = ui.draggable.attr('car_id');
 				$('#' + car_id)	.droppable('option','disabled',false)
 								.removeClass('served')
@@ -166,7 +223,8 @@ $("document").ready(function() {
 				// Cho vùng hãng xe drop đc
 				// (ngta exit ==> chắc chắn có 1 xe free)
 				// CHÚ Ý: có thể đang là cho drop luôn, kệ, cứ làm
-				brand_alias = car_id.substring(0, car_id.indexOf('-'));
+				brand_id = ui.draggable.attr('brand-id');
+				brand_alias = brandlistalias[brand_id];
 				$('#' + brand_alias).droppable('enable');
 				// <=> droppable('option','disabled',false)
 			}else{// bên phải kéo qua exit
@@ -174,19 +232,29 @@ $("document").ready(function() {
 			}
 			updateDisplayInfo();
 			ui.draggable.appendTo('#exit') // or appendTo($(this))
-						.css({
+			if(ui.draggable.hasClass('served')){
+				ui.draggable.css({
+								'position' : 'absolute',
+								'left' : '50%',
+								'top' : '50%',
+								'margin-left' : '-21px',
+								'margin-top' : '-21px'
+							});
+			}else{
+				ui.draggable.css({
 								'position' : 'absolute',
 								'left' : '50%',
 								'top' : '50%',
 								'margin-left' : '-41px',
 								'margin-top' : '-41px'
-							})
-						.fadeOut('2000', function() {
-							$('#exit').empty();
-							// or $(this).remove(); k giống như trên
-							// $(this) lúc này k phải là $('#exit')
-							// mà là 1 client nào đó
-						});
+							});
+			}
+			ui.draggable.fadeOut(1200, function() {
+				$('#exit').empty();
+				// or $(this).remove(); k giống như trên
+				// $(this) lúc này k phải là $('#exit')
+				// mà là 1 client nào đó
+			});
 		}
 	})
 
@@ -210,7 +278,7 @@ $("document").ready(function() {
 						'margin-top' : '-26px',
 						'margin-left' : '-26px',
 					})
-					.fadeOut('3000', function() {
+					.fadeOut(1200, function() {
 						$('#cashier').empty();
 					});
 			}else{ // ngta k mua
@@ -221,7 +289,8 @@ $("document").ready(function() {
 				// Cho vùng hãng xe drop đc 
 				// (ngta ko mua ==> chắc chắn có 1 xe free)
 				// CHÚ Ý: có thể đang cho drop luôn, kệ, cứ làm
-				brand_alias = car_id.substring(0, car_id.indexOf('-'));
+				brand_id = ui.draggable.attr('brand-id');
+				brand_alias = brandlistalias[brand_id];
 				$('#' + brand_alias).droppable('enable');
 
 				ui.draggable
@@ -233,7 +302,7 @@ $("document").ready(function() {
 						'margin-top' : '-26px',
 						'margin-left' : '-26px',
 					})
-					.fadeOut('2000', function() {
+					.fadeOut(1200, function() {
 						$('#cashier').empty();
 					});
 			}
@@ -242,4 +311,5 @@ $("document").ready(function() {
 	})
 
 	newClient();
+	checkVacancy();
 }); // hết sự kiện ready
